@@ -1,0 +1,80 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="booking-confirm-page">
+  <div class="booking-confirm-card">
+
+    <div class="booking-confirm-icon">
+      <i class="fa-solid fa-circle-check"></i>
+    </div>
+    <h2 class="booking-confirm-title">Booking Confirmed!</h2>
+    <p class="booking-confirm-sub">Your reservation is all set. Here's your summary.</p>
+
+    <div class="booking-confirm-listing">
+      <img src="<%= booking.listing.image.url %>" alt="<%= booking.listing.title %>" class="booking-confirm-img" />
+      <div>
+        <p class="booking-confirm-listing-title"><%= booking.listing.title %></p>
+        <p class="booking-confirm-listing-loc">
+          <i class="fa-solid fa-location-dot"></i>
+          <%= booking.listing.location %>, <%= booking.listing.country %>
+        </p>
+      </div>
+    </div>
+
+    <hr class="show-divider">
+
+    <div class="booking-details-grid">
+      <div class="booking-detail-item">
+        <span class="booking-detail-label">Check-in</span>
+        <span class="booking-detail-value"><%= booking.checkIn.toDateString() %></span>
+      </div>
+      <div class="booking-detail-item">
+        <span class="booking-detail-label">Check-out</span>
+        <span class="booking-detail-value"><%= booking.checkOut.toDateString() %></span>
+      </div>
+      <div class="booking-detail-item">
+        <span class="booking-detail-label">Guests</span>
+        <span class="booking-detail-value"><%= booking.guests %></span>
+      </div>
+      <div class="booking-detail-item">
+        <span class="booking-detail-label">Nights</span>
+        <span class="booking-detail-value"><%= booking.nights %></span>
+      </div>
+    </div>
+
+    <hr class="show-divider">
+
+    <!-- Price breakdown -->
+    <div class="price-breakdown-list">
+      <div class="breakdown-line">
+        <span>&#8377;<%= booking.listing.price.toLocaleString("en-IN") %> × <%= booking.nights %> night<%= booking.nights > 1 ? 's' : '' %></span>
+        <span>&#8377;<%= booking.basePrice.toLocaleString("en-IN") %></span>
+      </div>
+      <div class="breakdown-line">
+        <span>Cleaning fee</span>
+        <span>&#8377;<%= booking.cleaningFee.toLocaleString("en-IN") %></span>
+      </div>
+      <div class="breakdown-line">
+        <span>Service fee</span>
+        <span>&#8377;<%= booking.serviceFee.toLocaleString("en-IN") %></span>
+      </div>
+      <hr class="show-divider">
+      <div class="breakdown-line total-line">
+        <span>Total</span>
+        <span>&#8377;<%= booking.totalPrice.toLocaleString("en-IN") %></span>
+      </div>
+    </div>
+
+    <hr class="show-divider">
+
+    <div class="booking-confirm-status">
+      Status: <span class="status-badge status-<%= booking.status %>"><%= booking.status %></span>
+      &nbsp; Payment: <span class="status-badge status-<%= booking.payment === 'paid' ? 'confirmed' : 'cancelled' %>"><%= booking.payment %></span>
+    </div>
+
+    <div class="booking-confirm-actions">
+      <a href="/listings/<%= booking.listing._id %>" class="btn booking-back-btn">View listing</a>
+      <a href="/bookings" class="btn airbnb-btn">My bookings</a>
+    </div>
+
+  </div>
+</div>

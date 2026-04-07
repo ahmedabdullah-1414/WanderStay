@@ -1,0 +1,52 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="my-bookings-page">
+  <h2 class="my-bookings-title">My Bookings</h2>
+
+  <% if (bookings.length === 0) { %>
+    <div class="no-results">
+      <i class="fa-regular fa-calendar-xmark"></i>
+      <p>You haven't made any bookings yet.</p>
+      <a href="/listings" class="btn airbnb-btn mt-3">Explore listings</a>
+    </div>
+  <% } else { %>
+    <div class="my-bookings-grid">
+      <% for (let booking of bookings) { %>
+        <% if (booking.listing) { %>
+        <div class="my-booking-card <%= booking.status === 'cancelled' ? 'cancelled' : '' %>">
+          <img src="<%= booking.listing.image.url %>" alt="<%= booking.listing.title %>" class="my-booking-img" />
+          <div class="my-booking-info">
+            <div class="my-booking-header">
+              <span class="my-booking-title"><%= booking.listing.title %></span>
+              <span class="status-badge status-<%= booking.status %>"><%= booking.status %></span>
+            </div>
+            <p class="my-booking-loc">
+              <i class="fa-solid fa-location-dot"></i>
+              <%= booking.listing.location %>, <%= booking.listing.country %>
+            </p>
+            <div class="my-booking-dates">
+              <span><i class="fa-regular fa-calendar"></i> <%= booking.checkIn.toDateString() %></span>
+              <span class="date-arrow">→</span>
+              <span><%= booking.checkOut.toDateString() %></span>
+            </div>
+            <div class="my-booking-footer">
+              <span class="my-booking-price">
+                &#8377;<%= booking.totalPrice.toLocaleString("en-IN") %> total
+                · <%= booking.guests %> guest<%= booking.guests > 1 ? 's' : '' %>
+              </span>
+              <div class="my-booking-actions">
+                <a href="/bookings/<%= booking._id %>" class="btn booking-view-btn">View</a>
+                <% if (booking.status === 'confirmed') { %>
+                <form action="/bookings/<%= booking._id %>?_method=DELETE" method="POST" style="display:inline">
+                  <button class="btn booking-cancel-btn">Cancel</button>
+                </form>
+                <% } %>
+              </div>
+            </div>
+          </div>
+        </div>
+        <% } %>
+      <% } %>
+    </div>
+  <% } %>
+</div>

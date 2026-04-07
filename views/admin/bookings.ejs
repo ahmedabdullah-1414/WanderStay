@@ -1,0 +1,55 @@
+<% layout("/layouts/boilerplate") %>
+<% const adminPage = "bookings" %>
+<link rel="stylesheet" href="/css/admin.css">
+
+<div class="admin-layout">
+  <%- include("../includes/adminSidebar") %>
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <h1 class="admin-page-title">Bookings <span class="admin-count">(<%= total %>)</span></h1>
+      <form class="admin-search-form" method="GET" action="/admin/bookings">
+        <select name="status" class="admin-search-input" style="max-width:160px">
+          <option value=""          <%= status === ''          ? 'selected' : '' %>>All statuses</option>
+          <option value="confirmed" <%= status === 'confirmed' ? 'selected' : '' %>>Confirmed</option>
+          <option value="pending"   <%= status === 'pending'   ? 'selected' : '' %>>Pending</option>
+          <option value="cancelled" <%= status === 'cancelled' ? 'selected' : '' %>>Cancelled</option>
+        </select>
+        <button class="btn admin-search-btn">Filter</button>
+      </form>
+    </div>
+
+    <div class="admin-card">
+      <table class="admin-table">
+        <thead>
+          <tr><th>Guest</th><th>Listing</th><th>Check-in</th><th>Check-out</th><th>Nights</th><th>Total</th><th>Status</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+          <% bookings.forEach(b => { %>
+          <tr class="<%= b.status === 'cancelled' ? 'row-muted' : '' %>">
+            <td><%= b.guest ? b.guest.username : "—" %></td>
+            <td><%= b.listing ? b.listing.title : "—" %></td>
+            <td><%= b.checkIn.toLocaleDateString("en-IN") %></td>
+            <td><%= b.checkOut.toLocaleDateString("en-IN") %></td>
+            <td><%= b.nights || "—" %></td>
+            <td>&#8377;<%= b.totalPrice.toLocaleString("en-IN") %></td>
+            <td><span class="status-badge status-<%= b.status %>"><%= b.status %></span></td>
+            <td class="action-cell">
+              <% if (b.status !== 'cancelled') { %>
+              <form action="/admin/bookings/<%= b._id %>/cancel" method="POST" style="display:inline"
+                    onsubmit="return confirm('Cancel this booking?')">
+                <button class="btn admin-action-btn btn-block">Cancel</button>
+              </form>
+              <% } %>
+            </td>
+          </tr>
+          <% }) %>
+          <% if (!bookings.length) { %>
+          <tr><td colspan="8" class="text-center text-muted">No bookings found.</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+
+    <%- include("../includes/adminPagination", { page, totalPages, baseUrl: "/admin/bookings", query: { status } }) %>
+  </main>
+</div>

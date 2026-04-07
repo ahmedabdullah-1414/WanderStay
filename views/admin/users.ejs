@@ -1,0 +1,55 @@
+<% layout("/layouts/boilerplate") %>
+<% const adminPage = "users" %>
+<link rel="stylesheet" href="/css/admin.css">
+
+<div class="admin-layout">
+  <%- include("../includes/adminSidebar") %>
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <h1 class="admin-page-title">Users <span class="admin-count">(<%= total %>)</span></h1>
+      <form class="admin-search-form" method="GET" action="/admin/users">
+        <input type="text" name="search" value="<%= search %>" placeholder="Search by name or email..." class="admin-search-input">
+        <button class="btn admin-search-btn">Search</button>
+      </form>
+    </div>
+
+    <div class="admin-card">
+      <table class="admin-table">
+        <thead>
+          <tr><th>Username</th><th>Email</th><th>Status</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+          <% users.forEach(user => { %>
+          <tr class="<%= user.isBlocked ? 'row-muted' : '' %>">
+            <td><strong>@<%= user.username %></strong></td>
+            <td><%= user.email %></td>
+            <td>
+              <% if (user.isBlocked) { %>
+                <span class="status-badge status-cancelled">Blocked</span>
+              <% } else { %>
+                <span class="status-badge status-confirmed">Active</span>
+              <% } %>
+            </td>
+            <td class="action-cell">
+              <form action="/admin/users/<%= user._id %>/block" method="POST" style="display:inline">
+                <button class="btn admin-action-btn <%= user.isBlocked ? 'btn-unblock' : 'btn-block' %>">
+                  <%= user.isBlocked ? 'Unblock' : 'Block' %>
+                </button>
+              </form>
+              <form action="/admin/users/<%= user._id %>?_method=DELETE" method="POST" style="display:inline"
+                    onsubmit="return confirm('Delete this user permanently?')">
+                <button class="btn admin-action-btn btn-delete">Delete</button>
+              </form>
+            </td>
+          </tr>
+          <% }) %>
+          <% if (!users.length) { %>
+          <tr><td colspan="4" class="text-center text-muted">No users found.</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+
+    <%- include("../includes/adminPagination", { page, totalPages, baseUrl: "/admin/users", query: { search } }) %>
+  </main>
+</div>

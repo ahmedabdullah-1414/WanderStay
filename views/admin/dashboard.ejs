@@ -1,0 +1,109 @@
+<% layout("/layouts/boilerplate") %>
+<% const adminPage = "dashboard" %>
+<link rel="stylesheet" href="/css/admin.css">
+
+<div class="admin-layout">
+  <%- include("../includes/adminSidebar") %>
+
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <h1 class="admin-page-title">Dashboard</h1>
+      <span class="admin-welcome">Welcome, <strong><%= currUser.username %></strong></span>
+    </div>
+
+    <!-- Stat cards -->
+    <div class="admin-stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#fff0f1"><i class="fa-solid fa-users" style="color:#fe424d"></i></div>
+        <div>
+          <p class="stat-label">Total Users</p>
+          <p class="stat-value"><%= totalUsers %></p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#f0fdf4"><i class="fa-solid fa-house" style="color:#16a34a"></i></div>
+        <div>
+          <p class="stat-label">Total Listings</p>
+          <p class="stat-value"><%= totalListings %></p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#eff6ff"><i class="fa-regular fa-calendar-check" style="color:#2563eb"></i></div>
+        <div>
+          <p class="stat-label">Total Bookings</p>
+          <p class="stat-value"><%= totalBookings %></p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#fefce8"><i class="fa-solid fa-indian-rupee-sign" style="color:#ca8a04"></i></div>
+        <div>
+          <p class="stat-label">Total Revenue</p>
+          <p class="stat-value">&#8377;<%= totalRevenue.toLocaleString("en-IN") %></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="admin-charts-grid">
+      <div class="admin-card">
+        <h3 class="admin-card-title">Monthly Bookings</h3>
+        <canvas id="bookingsChart" height="120"></canvas>
+      </div>
+      <div class="admin-card">
+        <h3 class="admin-card-title">Monthly Revenue</h3>
+        <canvas id="revenueChart" height="120"></canvas>
+      </div>
+    </div>
+
+    <!-- Top listings -->
+    <div class="admin-card mt-4">
+      <h3 class="admin-card-title">Most Booked Listings</h3>
+      <table class="admin-table">
+        <thead>
+          <tr><th>#</th><th>Listing</th><th>Location</th><th>Bookings</th></tr>
+        </thead>
+        <tbody>
+          <% topListings.forEach((item, i) => { %>
+          <tr>
+            <td><%= i + 1 %></td>
+            <td><%= item.listing.title %></td>
+            <td><%= item.listing.location %></td>
+            <td><span class="badge-blue"><%= item.count %></span></td>
+          </tr>
+          <% }) %>
+          <% if (!topListings.length) { %>
+          <tr><td colspan="4" class="text-center text-muted">No data yet</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const labels   = <%- chartLabels %>;
+  const bookings = <%- chartBookings %>;
+  const revenue  = <%- chartRevenue %>;
+
+  new Chart(document.getElementById("bookingsChart"), {
+    type: "bar",
+    data: {
+      labels,
+      datasets: [{ label: "Bookings", data: bookings,
+        backgroundColor: "rgba(254,66,77,0.7)", borderRadius: 6 }]
+    },
+    options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+  });
+
+  new Chart(document.getElementById("revenueChart"), {
+    type: "line",
+    data: {
+      labels,
+      datasets: [{ label: "Revenue (₹)", data: revenue,
+        borderColor: "#fe424d", backgroundColor: "rgba(254,66,77,0.1)",
+        fill: true, tension: 0.4, pointRadius: 4 }]
+    },
+    options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+  });
+</script>

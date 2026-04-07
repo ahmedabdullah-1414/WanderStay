@@ -1,0 +1,11 @@
+<% if (totalPages > 1) { %>
+<div class="admin-pagination">
+  <% for (let i = 1; i <= totalPages; i++) { %>
+    <%
+      const params = new URLSearchParams({ ...query, page: i });
+    %>
+    <a href="<%= baseUrl %>?<%= params.toString() %>"
+       class="page-btn <%= page === i ? 'active' : '' %>"><%= i %></a>
+  <% } %>
+</div>
+<% } %>

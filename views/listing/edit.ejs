@@ -1,0 +1,72 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="form-page-wrapper">
+  <div class="form-card">
+    <div class="form-card-header">
+      <h2 class="form-card-title">Edit your listing</h2>
+      <p class="form-card-subtitle">Update the details of your place</p>
+    </div>
+
+    <form action="/listings/<%=listUpdt._id%>?_method=PUT" method="POST" class="needs-validation" novalidate enctype="multipart/form-data">
+
+      <div class="mb-3">
+        <label for="title" class="form-label">Title</label>
+        <input type="text" name="listing[title]" value="<%=listUpdt.title%>" class="form-control airbnb-input" required>
+        <div class="invalid-feedback">Please add a title.</div>
+      </div>
+
+      <div class="mb-3">
+        <label for="description" class="form-label">Description</label>
+        <textarea name="listing[description]" class="form-control airbnb-input" rows="4" required><%=listUpdt.description%></textarea>
+        <div class="invalid-feedback">Please add a description.</div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Current photo</label>
+        <div class="current-img-wrap">
+          <img src="<%= orignalImageUrl %>" alt="Current listing image" class="current-img">
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="image" class="form-label">Replace photo</label>
+        <div class="upload-area">
+          <i class="fa-regular fa-image upload-icon"></i>
+          <p class="upload-text">Click to upload a new photo</p>
+          <input type="file" name="listing[image]" class="upload-input">
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="mb-3 col-md-4">
+          <label for="price" class="form-label">Price per night (₹)</label>
+          <input type="number" name="listing[price]" value="<%=listUpdt.price%>" class="form-control airbnb-input" required>
+          <div class="invalid-feedback">Please add a price.</div>
+        </div>
+        <div class="mb-3 col-md-8">
+          <label for="location" class="form-label">Location</label>
+          <input type="text" name="listing[location]" value="<%=listUpdt.location%>" class="form-control airbnb-input" required>
+          <div class="invalid-feedback">Please add a location.</div>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label for="country" class="form-label">Country</label>
+        <input type="text" name="listing[country]" value="<%=listUpdt.country%>" class="form-control airbnb-input" required>
+        <div class="invalid-feedback">Please add a country.</div>
+      </div>
+
+      <div class="mb-4">
+        <label for="category" class="form-label">Category</label>
+        <select name="listing[category]" class="form-control airbnb-input" required>
+          <% const cats = ["Trending","Rooms","Iconic Cities","Mountains","Castles","Amazing Pools","Arctic","Domes","Boats","Camping","Farms"]; %>
+          <% for (let c of cats) { %>
+            <option value="<%= c %>" <%= listUpdt.category === c ? 'selected' : '' %>><%= c %></option>
+          <% } %>
+        </select>
+      </div>
+
+      <button class="btn airbnb-btn w-100">Save changes</button>
+    </form>
+  </div>
+</div>

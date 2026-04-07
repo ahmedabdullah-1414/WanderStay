@@ -1,0 +1,217 @@
+<% layout("/layouts/boilerplate") -%>
+<script>
+  const mapToken = "<%= process.env.MAP_TOKEN %>";
+  const coordinates = <%- JSON.stringify(listing.geometry && listing.geometry.coordinates && listing.geometry.coordinates.length ? listing.geometry.coordinates : null) %>;
+</script>
+
+<div class="show-page">
+
+  <!-- Title & location -->
+  <div class="show-header">
+    <h1 class="show-title"><%= listing.title %></h1>
+    <p class="show-location"><i class="fa-solid fa-location-dot"></i> <%= listing.location %>, <%= listing.country %></p>
+  </div>
+
+  <!-- Hero image -->
+  <div class="show-hero">
+    <img src="<%= listing.image.url %>" alt="<%= listing.title %>" class="show-hero-img" />
+  </div>
+
+  <!-- Content grid -->
+  <div class="show-grid">
+
+    <!-- Left: details + reviews -->
+    <div class="show-left">
+
+      <div class="show-host-row">
+        <div>
+          <p class="show-hosted-by">Hosted by <strong><%= listing.owner.username %></strong></p>
+          <p class="show-category-tag"><i class="fa-solid fa-tag"></i> <%= listing.category || "Trending" %></p>
+        </div>
+        <div class="show-host-avatar"><i class="fa-solid fa-circle-user"></i></div>
+      </div>
+
+      <hr class="show-divider">
+
+      <p class="show-description"><%= listing.description %></p>
+
+      <hr class="show-divider">
+
+      <!-- Map -->
+      <div class="show-map-section">
+        <h3 class="show-section-title">Where you'll be</h3>
+        <p class="show-map-subtitle"><%= listing.location %>, <%= listing.country %></p>
+        <div id="map"></div>
+        <% if (!listing.geometry || !listing.geometry.coordinates || !listing.geometry.coordinates.length) { %>
+          <p class="show-map-note"><i class="fa-solid fa-triangle-exclamation"></i> Map unavailable for this listing.</p>
+        <% } else { %>
+          <p class="show-map-note"><i class="fa-solid fa-circle-info"></i> Exact address provided after booking.</p>
+        <% } %>
+      </div>
+
+      <hr class="show-divider">
+
+      <!-- Reviews -->
+      <% if(currUser){ %>
+      <div class="show-review-form">
+        <h3 class="show-section-title">Leave a review</h3>
+        <form action="/listings/<%= listing._id %>/reviews" method="POST" class="needs-validation" novalidate>
+          <div class="mb-3">
+            <fieldset class="starability-grow">
+              <legend class="visually-hidden">Rating</legend>
+              <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="1" checked aria-label="No rating." />
+              <input type="radio" id="first-rate1" name="review[rating]" value="1" /><label for="first-rate1" title="Terrible">1 star</label>
+              <input type="radio" id="first-rate2" name="review[rating]" value="2" /><label for="first-rate2" title="Not good">2 stars</label>
+              <input type="radio" id="first-rate3" name="review[rating]" value="3" /><label for="first-rate3" title="Average">3 stars</label>
+              <input type="radio" id="first-rate4" name="review[rating]" value="4" /><label for="first-rate4" title="Very good">4 stars</label>
+              <input type="radio" id="first-rate5" name="review[rating]" value="5" /><label for="first-rate5" title="Amazing">5 stars</label>
+            </fieldset>
+          </div>
+          <div class="mb-3">
+            <textarea name="review[comment]" placeholder="Share your experience..." rows="4" class="form-control airbnb-input" required></textarea>
+            <div class="invalid-feedback">Please add a comment.</div>
+          </div>
+          <button class="btn airbnb-btn">Submit review</button>
+        </form>
+      </div>
+      <hr class="show-divider">
+      <% } %>
+
+      <% if(listing.reviews.length > 0){ %>
+      <div class="show-reviews">
+        <h3 class="show-section-title"><i class="fa-solid fa-star"></i> <%= listing.reviews.length %> review<%= listing.reviews.length > 1 ? 's' : '' %></h3>
+        <div class="reviews-grid">
+          <% for(let review of listing.reviews){ %>
+          <div class="review-card">
+            <div class="review-header">
+              <span class="review-author">@<%= review.author.username %></span>
+              <p class="starability-result" data-rating="<%= review.rating %>"></p>
+            </div>
+            <p class="review-comment"><%= review.comment %></p>
+            <% if (currUser && review.author && review.author._id.equals(currUser._id)) { %>
+            <form method="POST" action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE">
+              <button class="btn review-delete-btn">Delete</button>
+            </form>
+            <% } %>
+          </div>
+          <% } %>
+        </div>
+      </div>
+      <% } %>
+
+    </div>
+
+    <!-- Right: booking card -->
+    <div class="show-right">
+      <div class="booking-card">
+        <div class="booking-price">
+          <span class="booking-amount">&#8377;<%= listing.price.toLocaleString("en-IN") %></span>
+          <span class="booking-per"> / night</span>
+        </div>
+        <hr class="show-divider">
+        <% if(currUser && listing.owner._id.equals(currUser._id)){ %>
+          <a href="/listings/<%= listing._id %>/edit" class="btn airbnb-btn w-100 mb-2">Edit listing</a>
+          <form action="/listings/<%= listing._id %>?_method=DELETE" method="POST">
+            <button class="btn booking-delete-btn w-100">Delete listing</button>
+          </form>
+        <% } else if (currUser) { %>
+          <form action="/listings/<%= listing._id %>/bookings" method="POST" class="needs-validation" novalidate>
+            <div class="booking-dates-row">
+              <div class="booking-date-field">
+                <label class="booking-date-label">CHECK-IN</label>
+                <input type="date" name="booking[checkIn]" class="booking-date-input" required />
+              </div>
+              <div class="booking-date-divider"></div>
+              <div class="booking-date-field">
+                <label class="booking-date-label">CHECK-OUT</label>
+                <input type="date" name="booking[checkOut]" class="booking-date-input" required />
+              </div>
+            </div>
+            <div class="booking-guests-field">
+              <label class="booking-date-label">GUESTS</label>
+              <select name="booking[guests]" class="booking-guests-select">
+                <% for(let i = 1; i <= 10; i++) { %>
+                  <option value="<%= i %>"><%= i %> guest<%= i > 1 ? 's' : '' %></option>
+                <% } %>
+              </select>
+            </div>
+            <button class="btn airbnb-btn w-100 mt-3">Reserve</button>
+            <p class="booking-note">You won't be charged yet</p>
+          </form>
+          <hr class="show-divider">
+          <div class="booking-price-breakdown" id="price-breakdown" style="display:none">
+            <div class="breakdown-row">
+              <span>&#8377;<%= listing.price.toLocaleString("en-IN") %> × <span id="nights-count">0</span> nights</span>
+              <span id="breakdown-base"></span>
+            </div>
+            <div class="breakdown-row">
+              <span>Cleaning fee</span>
+              <span id="breakdown-cleaning"></span>
+            </div>
+            <div class="breakdown-row">
+              <span>Service fee <small>(12%)</small></span>
+              <span id="breakdown-service"></span>
+            </div>
+            <hr class="show-divider">
+            <div class="breakdown-row" style="font-weight:700;color:#222">
+              <span>Total</span>
+              <span id="breakdown-total"></span>
+            </div>
+          </div>
+        <% } else { %>
+          <a href="/login" class="btn airbnb-btn w-100">Log in to reserve</a>
+          <p class="booking-note">You won't be charged yet</p>
+        <% } %>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="/js/map.js"></script>
+<script>
+  const pricePerNight = <%= listing.price %>;
+  const CLEANING_FEE  = 500;
+  const SERVICE_RATE  = 0.12;
+
+  const checkInInput   = document.querySelector('input[name="booking[checkIn]"]');
+  const checkOutInput  = document.querySelector('input[name="booking[checkOut]"]');
+  const breakdown      = document.getElementById("price-breakdown");
+  const nightsCount    = document.getElementById("nights-count");
+  const breakdownBase  = document.getElementById("breakdown-base");
+  const breakdownClean = document.getElementById("breakdown-cleaning");
+  const breakdownSvc   = document.getElementById("breakdown-service");
+  const breakdownTotal = document.getElementById("breakdown-total");
+
+  const today = new Date().toISOString().split("T")[0];
+  if (checkInInput)  checkInInput.min  = today;
+  if (checkOutInput) checkOutInput.min = today;
+
+  function fmt(n) { return "₹" + n.toLocaleString("en-IN"); }
+
+  function updateBreakdown() {
+    if (!checkInInput || !checkOutInput) return;
+    const ci = new Date(checkInInput.value);
+    const co = new Date(checkOutInput.value);
+    if (checkInInput.value && checkOutInput.value && co > ci) {
+      checkOutInput.min = checkInInput.value;
+      const nights     = Math.ceil((co - ci) / (1000 * 60 * 60 * 24));
+      const base       = nights * pricePerNight;
+      const cleaning   = CLEANING_FEE;
+      const service    = Math.round(base * SERVICE_RATE);
+      const total      = base + cleaning + service;
+
+      nightsCount.textContent    = nights;
+      breakdownBase.textContent  = fmt(base);
+      breakdownClean.textContent = fmt(cleaning);
+      breakdownSvc.textContent   = fmt(service);
+      breakdownTotal.textContent = fmt(total);
+      breakdown.style.display    = "block";
+    } else {
+      breakdown.style.display = "none";
+    }
+  }
+
+  if (checkInInput)  checkInInput.addEventListener("change", updateBreakdown);
+  if (checkOutInput) checkOutInput.addEventListener("change", updateBreakdown);
+</script>

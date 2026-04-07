@@ -1,0 +1,59 @@
+<% layout("/layouts/boilerplate") %><%=success%>
+
+<div id="filters-bar">
+  <div id="filters">
+    <% const categories = [
+      { label: "Trending",      icon: "fa-solid fa-fire",            color: "#ff385c" },
+      { label: "Rooms",         icon: "fa-solid fa-bed",             color: "#0ea5e9" },
+      { label: "Iconic Cities", icon: "fa-solid fa-city",            color: "#8b5cf6" },
+      { label: "Mountains",     icon: "fa-solid fa-mountain",        color: "#10b981" },
+      { label: "Castles",       icon: "fa-brands fa-fort-awesome",   color: "#f59e0b" },
+      { label: "Amazing Pools", icon: "fa-solid fa-person-swimming", color: "#06b6d4" },
+      { label: "Arctic",        icon: "fa-regular fa-snowflake",     color: "#64748b" },
+      { label: "Domes",         icon: "fa-solid fa-mosque",          color: "#d97706" },
+      { label: "Boats",         icon: "fa-solid fa-sailboat",        color: "#3b82f6" },
+      { label: "Camping",       icon: "fa-solid fa-campground",      color: "#84cc16" },
+      { label: "Farms",         icon: "fa-solid fa-cow",             color: "#78716c" },
+    ]; %>
+    <% for (let cat of categories) { %>
+      <a href="/listings?category=<%= encodeURIComponent(cat.label) %>"
+         class="filter-item <%= activeCategory === cat.label ? 'active' : '' %>"
+         style="<%= activeCategory === cat.label ? `--filter-color:${cat.color}` : `--filter-color:${cat.color}` %>">
+        <div class="filter-icon-wrap" style="color: <%= activeCategory === cat.label ? '#fff' : cat.color %>">
+          <i class="<%= cat.icon %>"></i>
+        </div>
+        <p><%= cat.label %></p>
+      </a>
+    <% } %>
+  </div>
+</div>
+
+<div class="listings-grid">
+  <% if (allListing.length === 0) { %>
+    <div class="no-results">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <p>No listings found in this category yet.</p>
+      <a href="/listings" class="btn airbnb-btn mt-3">Browse all</a>
+    </div>
+  <% } %>
+  <% for (let listing of allListing) { %>
+  <a href="/listings/<%=listing._id%>" class="listing-link">
+    <div class="listing-card">
+      <div class="listing-img-wrap">
+        <img src="<%= listing.image.url %>" alt="<%= listing.title %>" class="listing-img" />
+        <button class="wishlist-btn" aria-label="Save to wishlist">
+          <i class="fa-regular fa-heart"></i>
+        </button>
+      </div>
+      <div class="listing-info">
+        <div class="listing-title-row">
+          <span class="listing-title"><%= listing.title %></span>
+          <span class="listing-rating"><i class="fa-solid fa-star"></i> 4.9</span>
+        </div>
+        <p class="listing-location text-muted">Wanderstay</p>
+        <p class="listing-price"><span>&#8377;<%= listing.price.toLocaleString("en-IN") %></span> / night</p>
+      </div>
+    </div>
+  </a>
+  <% } %>
+</div>

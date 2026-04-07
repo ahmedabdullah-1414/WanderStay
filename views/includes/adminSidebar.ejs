@@ -1,0 +1,27 @@
+<aside class="admin-sidebar">
+  <div class="admin-brand">
+    <i class="fa-regular fa-compass"></i>
+    <span>Admin</span>
+  </div>
+  <nav class="admin-nav">
+    <a href="/admin"          class="admin-nav-link <%= typeof adminPage !== 'undefined' && adminPage === 'dashboard' ? 'active' : '' %>">
+      <i class="fa-solid fa-gauge"></i> Dashboard
+    </a>
+    <a href="/admin/users"    class="admin-nav-link <%= typeof adminPage !== 'undefined' && adminPage === 'users'     ? 'active' : '' %>">
+      <i class="fa-solid fa-users"></i> Users
+    </a>
+    <a href="/admin/listings" class="admin-nav-link <%= typeof adminPage !== 'undefined' && adminPage === 'listings'  ? 'active' : '' %>">
+      <i class="fa-solid fa-house"></i> Listings
+    </a>
+    <a href="/admin/bookings" class="admin-nav-link <%= typeof adminPage !== 'undefined' && adminPage === 'bookings'  ? 'active' : '' %>">
+      <i class="fa-regular fa-calendar-check"></i> Bookings
+    </a>
+    <hr style="border-color:#333;margin:1rem 0">
+    <a href="/listings" class="admin-nav-link">
+      <i class="fa-solid fa-arrow-left"></i> Back to site
+    </a>
+    <a href="/logout" class="admin-nav-link" style="color:#fe424d">
+      <i class="fa-solid fa-right-from-bracket"></i> Logout
+    </a>
+  </nav>
+</aside>
