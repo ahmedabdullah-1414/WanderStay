@@ -42,20 +42,26 @@ module.exports.postListing=async (req, res) => {
 
     const { location } = req.body.listing;
     const geoURL = `https://api.maptiler.com/geocoding/${encodeURIComponent(location)}.json?key=${process.env.MAP_TOKEN}`;
-    const geoResponse = await axios.get(geoURL);
 
-    if (!geoResponse.data.features || geoResponse.data.features.length === 0) {
-        req.flash("error", "Could not find location on map. Please enter a valid location.");
-        return res.redirect("/listings/new");
+    let geometry;
+    try {
+        const geoResponse = await axios.get(geoURL);
+        if (geoResponse.data.features && geoResponse.data.features.length > 0) {
+            geometry = geoResponse.data.features[0].geometry;
+        } else {
+            geometry = { type: "Point", coordinates: [0, 0] };
+        }
+    } catch(e) {
+        geometry = { type: "Point", coordinates: [0, 0] };
     }
 
     const newList = new Listing(req.body.listing);
     newList.owner    = req.user._id;
     newList.image    = { url, filename };
-    newList.geometry = geoResponse.data.features[0].geometry;
+    newList.geometry = geometry;
 
     await newList.save();
-    req.flash("success","New Listing Created");
+    req.flash("success", "New Listing Created");
     res.redirect("/listings");
 };
 
