@@ -34,6 +34,11 @@ async function main() {
   const col = mongoose.connection.collection("listings");
   await col.deleteMany({});
 
+  // use first admin/user as owner for seeded listings
+  const ownerDoc = await mongoose.connection.collection("users").findOne({ role: "admin" })
+    || await mongoose.connection.collection("users").findOne({});
+  const ownerId = ownerDoc ? ownerDoc._id : new mongoose.Types.ObjectId();
+
   const data = initData.data.map(obj => ({
     title:       obj.title,
     description: obj.description,
@@ -44,6 +49,7 @@ async function main() {
     category:    guessCategory(obj),
     geometry:    obj.geometry || { type: "Point", coordinates: [0, 0] },
     reviews:     [],
+    owner:       ownerId,
   }));
 
   await col.insertMany(data);
