@@ -20,14 +20,30 @@ const listingController=require("../controllers/listings.js");
 
 router.route("/")
     .get(wrapAsync(listingController.index))
-    .post(isLoggedIn, upload.single('image'), validateListing, wrapAsync(listingController.postListing));
+    .post(isLoggedIn, (req, res, next) => {
+        upload.single('image')(req, res, (err) => {
+            if (err) {
+                req.flash("error", `Upload failed: ${err.message}`);
+                return res.redirect("/listings/new");
+            }
+            next();
+        });
+    }, validateListing, wrapAsync(listingController.postListing));
 
 // New 
 router.get("/new", isLoggedIn, listingController.renderNewForm);
 
 router.route("/:id")
     .get(wrapAsync(listingController.showNewListing))
-    .put(isLoggedIn, ownerOf, upload.single('image'), validateListing, wrapAsync(listingController.updateListing))
+    .put(isLoggedIn, ownerOf, (req, res, next) => {
+        upload.single('image')(req, res, (err) => {
+            if (err) {
+                req.flash("error", `Upload failed: ${err.message}`);
+                return res.redirect("back");
+            }
+            next();
+        });
+    }, validateListing, wrapAsync(listingController.updateListing))
     .delete(isLoggedIn, ownerOf, wrapAsync(listingController.deleteListing))
 
 // Edit
