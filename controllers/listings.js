@@ -68,23 +68,31 @@ module.exports.renderEditForm=async(req,res)=>{
 
 module.exports.updateListing=async (req, res) => {
     let { id } = req.params;
-    let listing=await Listing.findByIdAndUpdate(id, { ...req.body.listing });
+    let listing = await Listing.findByIdAndUpdate(id, { ...req.body.listing }, { new: true });
 
-    if (typeof req.file !== "undefined") {
-        let url=req.file.path;
-        let filename=req.file.filename;
-        listing.image={ url,filename };
-        await listing.save();
+    // re-geocode if location changed
+    if (req.body.listing.location) {
+        try {
+            const geoURL = `https://api.maptiler.com/geocoding/${encodeURIComponent(req.body.listing.location)}.json?key=${process.env.MAP_TOKEN}`;
+            const geoResponse = await axios.get(geoURL);
+            if (geoResponse.data.features && geoResponse.data.features.length > 0) {
+                listing.geometry = geoResponse.data.features[0].geometry;
+            }
+        } catch(e) { /* keep existing geometry if geocoding fails */ }
     }
 
+    if (typeof req.file !== "undefined") {
+        listing.image = { url: req.file.path, filename: req.file.filename };
+    }
+
+    await listing.save();
     req.flash("success", "Listing Updated");
-    res.redirect(`/listings/${id}`); 
+    res.redirect(`/listings/${id}`);
 };
 
 module.exports.deleteListing=async(req,res)=>{
-    let{id}=req.params; 
-    const delList=await Listing.findByIdAndDelete(id);
-    console.log(delList);
+    let { id } = req.params;
+    await Listing.findByIdAndDelete(id);
     req.flash("success","Listing Deleted");
-    res.redirect("/listings")
+    res.redirect("/listings");
 };

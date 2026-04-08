@@ -25,7 +25,7 @@
 
       <div class="show-host-row">
         <div>
-          <p class="show-hosted-by">Hosted by <strong><%= listing.owner.username %></strong></p>
+          <p class="show-hosted-by">Hosted by <strong><%= listing.owner ? listing.owner.username : "Unknown" %></strong></p>
           <p class="show-category-tag"><i class="fa-solid fa-tag"></i> <%= listing.category || "Trending" %></p>
         </div>
         <div class="show-host-avatar"><i class="fa-solid fa-circle-user"></i></div>
@@ -109,7 +109,7 @@
           <span class="booking-per"> / night</span>
         </div>
         <hr class="show-divider">
-        <% if(currUser && listing.owner._id.equals(currUser._id)){ %>
+        <% if(currUser && listing.owner && listing.owner._id.equals(currUser._id)){ %>
           <a href="/listings/<%= listing._id %>/edit" class="btn airbnb-btn w-100 mb-2">Edit listing</a>
           <form action="/listings/<%= listing._id %>?_method=DELETE" method="POST">
             <button class="btn booking-delete-btn w-100">Delete listing</button>
