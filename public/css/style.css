@@ -927,3 +927,42 @@ body {
     font-size: 1rem;
     color: #222;
 }
+
+/* ── Wishlist heart saved state ── */
+.wishlist-btn.saved i {
+    color: #fe424d !important;
+    filter: none;
+}
+
+/* ── Empty state ── */
+.empty-state {
+    text-align: center;
+    padding: 5rem 1rem;
+    max-width: 400px;
+    margin: 0 auto;
+}
+.empty-state-icon {
+    width: 5rem;
+    height: 5rem;
+    background: #fff0f1;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+}
+.empty-state-icon i {
+    font-size: 2rem;
+    color: #fe424d;
+}
+.empty-state-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #222;
+    margin-bottom: 0.5rem;
+}
+.empty-state-sub {
+    font-size: 0.95rem;
+    color: #717171;
+    margin-bottom: 1.5rem;
+}

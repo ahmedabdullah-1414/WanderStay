@@ -47,12 +47,35 @@ module.exports.dashboard = async (req, res) => {
         { $project: { "listing.title": 1, "listing.location": 1, count: 1 } }
     ]);
 
+    // revenue by category
+    const categoryRevenue = await Booking.aggregate([
+        { $match: { status: { $ne: "cancelled" } } },
+        { $lookup: { from: "listings", localField: "listing", foreignField: "_id", as: "listing" } },
+        { $unwind: "$listing" },
+        { $group: { _id: "$listing.category", revenue: { $sum: "$totalPrice" } } },
+        { $sort: { revenue: -1 } }
+    ]);
+
+    // revenue by country
+    const countryRevenue = await Booking.aggregate([
+        { $match: { status: { $ne: "cancelled" } } },
+        { $lookup: { from: "listings", localField: "listing", foreignField: "_id", as: "listing" } },
+        { $unwind: "$listing" },
+        { $group: { _id: "$listing.country", revenue: { $sum: "$totalPrice" } } },
+        { $sort: { revenue: -1 } },
+        { $limit: 8 }
+    ]);
+
     res.render("admin/dashboard.ejs", {
         totalUsers, totalListings, totalBookings, totalRevenue,
-        chartLabels: JSON.stringify(chartLabels),
+        chartLabels:   JSON.stringify(chartLabels),
         chartBookings: JSON.stringify(chartBookings),
-        chartRevenue: JSON.stringify(chartRevenue),
+        chartRevenue:  JSON.stringify(chartRevenue),
         topListings,
+        categoryLabels:  JSON.stringify(categoryRevenue.map(d => d._id || "Unknown")),
+        categoryRevenue: JSON.stringify(categoryRevenue.map(d => d.revenue)),
+        countryLabels:   JSON.stringify(countryRevenue.map(d => d._id || "Unknown")),
+        countryRevenue:  JSON.stringify(countryRevenue.map(d => d.revenue)),
     });
 };
 

@@ -3,16 +3,23 @@
 <div class="my-bookings-page">
   <h2 class="my-bookings-title">My Bookings</h2>
 
-  <% if (bookings.length === 0) { %>
-    <div class="no-results">
-      <i class="fa-regular fa-calendar-xmark"></i>
-      <p>You haven't made any bookings yet.</p>
-      <a href="/listings" class="btn airbnb-btn mt-3">Explore listings</a>
+  <%
+    // filter out bookings whose listing was deleted
+    const validBookings = bookings.filter(b => b.listing);
+  %>
+
+  <% if (validBookings.length === 0) { %>
+    <div class="empty-state">
+      <div class="empty-state-icon">
+        <i class="fa-regular fa-calendar-xmark"></i>
+      </div>
+      <h3 class="empty-state-title">No trips booked yet</h3>
+      <p class="empty-state-sub">Time to dust off your bags and plan your next adventure.</p>
+      <a href="/listings" class="btn airbnb-btn px-4">Explore listings</a>
     </div>
   <% } else { %>
     <div class="my-bookings-grid">
-      <% for (let booking of bookings) { %>
-        <% if (booking.listing) { %>
+      <% for (let booking of validBookings) { %>
         <div class="my-booking-card <%= booking.status === 'cancelled' ? 'cancelled' : '' %>">
           <img src="<%= booking.listing.image.url %>" alt="<%= booking.listing.title %>" class="my-booking-img" />
           <div class="my-booking-info">
@@ -45,7 +52,6 @@
             </div>
           </div>
         </div>
-        <% } %>
       <% } %>
     </div>
   <% } %>

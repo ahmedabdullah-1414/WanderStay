@@ -1,7 +1,6 @@
 if(process.env.NODE_ENV != "production"){
-    require('dotenv').config() 
+    require('dotenv').config();
 }
-console.log(process.env) 
 
 const express=require("express");
 const app= express();
@@ -16,14 +15,17 @@ const passport=require("passport");
 const LocalStrategy=require("passport-local");
 const User=require("./models/user.js");
 
+const { isNotBlocked } = require("./middleware.js");
+
 const listingRouter   = require("./routes/listing.js")
 const reviewRouter    = require("./routes/review.js")
 const userRouter      = require("./routes/user.js")
 const bookingRouter   = require("./routes/booking.js")
 const myBookingsRouter= require("./routes/myBookings.js")
 const adminRouter     = require("./routes/admin.js")
+const wishlistRouter  = require("./routes/wishlist.js")
 
-const URL_MONGO='mongodb://127.0.0.1:27017/wanderlust';
+const URL_MONGO = process.env.MONGO_URL || 'mongodb://127.0.0.1:27017/wanderlust';
 
 main().then(()=>{
     console.log("Connected To DBs")
@@ -41,19 +43,19 @@ app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname,"/public")));
 app.engine('ejs', ejsMate);
 
-const sessionOptions={
-    secret:"mysecretcode",
-    resave:false,
-    saveUninitialized:true,
-    cookie:{
-        expires:Date.now()+7*24*60*60*1000,
-        maxAge:7*24*60*60*1000,
-        httpOnly:true,
+const sessionOptions = {
+    secret: process.env.SECRET || "mysecretcode",
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        expires: Date.now() + 7*24*60*60*1000,
+        maxAge:  7*24*60*60*1000,
+        httpOnly: true,
     },
 }
 
-app.get("/", (req,res) => {
-    res.send("This is the root ");
+app.get("/", (req, res) => {
+    res.redirect("/listings");
 });
 
 app.use(session(sessionOptions));
@@ -71,7 +73,10 @@ app.use((req,res,next)=>{
     res.locals.error=req.flash("error");
     res.locals.currUser=req.user;
     next();
-})   
+});
+
+// kick blocked users out on every request
+app.use(isNotBlocked);
 
 // app.get("/demoUser",async(req,res)=>{
 //     let fakeUser=new User({
@@ -88,6 +93,7 @@ app.use("/listings",listingRouter);
 app.use("/listings/:id/reviews",reviewRouter);
 app.use("/listings/:id/bookings", bookingRouter);
 app.use("/bookings", myBookingsRouter);
+app.use("/wishlist", wishlistRouter);
 app.use("/admin", adminRouter);
 app.use("/",userRouter);
 
@@ -100,6 +106,6 @@ app.use((err,req,res,next)=>{
     res.status(statusCode).render("error.ejs",{err})
 });
 
-app.listen(8080,()=>{
-    console.log("Listening To the port");
+app.listen(process.env.PORT || 8080, () => {
+    console.log("Server running");
 });

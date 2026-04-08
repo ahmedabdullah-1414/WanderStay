@@ -55,6 +55,18 @@
       </div>
     </div>
 
+    <!-- Revenue by category & country -->
+    <div class="admin-charts-grid mt-4">
+      <div class="admin-card">
+        <h3 class="admin-card-title">Revenue by Category</h3>
+        <canvas id="categoryChart" height="160"></canvas>
+      </div>
+      <div class="admin-card">
+        <h3 class="admin-card-title">Revenue by Country <small style="font-size:0.75rem;color:#aaa">(top 8)</small></h3>
+        <canvas id="countryChart" height="160"></canvas>
+      </div>
+    </div>
+
     <!-- Top listings -->
     <div class="admin-card mt-4">
       <h3 class="admin-card-title">Most Booked Listings</h3>
@@ -86,6 +98,18 @@
   const bookings = <%- chartBookings %>;
   const revenue  = <%- chartRevenue %>;
 
+  const categoryLabels  = <%- categoryLabels %>;
+  const categoryRevenue = <%- categoryRevenue %>;
+  const countryLabels   = <%- countryLabels %>;
+  const countryRevenue  = <%- countryRevenue %>;
+
+  // palette for doughnut/bar slices
+  const palette = [
+    "#fe424d","#ff8c42","#f9c74f","#90be6d",
+    "#43aa8b","#4d908e","#577590","#277da1",
+    "#8b5cf6","#06b6d4","#84cc16","#78716c"
+  ];
+
   new Chart(document.getElementById("bookingsChart"), {
     type: "bar",
     data: {
@@ -105,5 +129,51 @@
         fill: true, tension: 0.4, pointRadius: 4 }]
     },
     options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+  });
+
+  new Chart(document.getElementById("categoryChart"), {
+    type: "doughnut",
+    data: {
+      labels: categoryLabels,
+      datasets: [{
+        data: categoryRevenue,
+        backgroundColor: palette,
+        borderWidth: 2,
+        borderColor: "#fff"
+      }]
+    },
+    options: {
+      plugins: {
+        legend: { position: "right", labels: { font: { size: 11 }, boxWidth: 14 } },
+        tooltip: {
+          callbacks: {
+            label: ctx => ` ₹${ctx.parsed.toLocaleString("en-IN")}`
+          }
+        }
+      }
+    }
+  });
+
+  new Chart(document.getElementById("countryChart"), {
+    type: "bar",
+    data: {
+      labels: countryLabels,
+      datasets: [{
+        label: "Revenue (₹)",
+        data: countryRevenue,
+        backgroundColor: palette,
+        borderRadius: 6
+      }]
+    },
+    options: {
+      indexAxis: "y",
+      plugins: { legend: { display: false } },
+      scales: {
+        x: {
+          beginAtZero: true,
+          ticks: { callback: v => "₹" + (v/1000).toFixed(0) + "k" }
+        }
+      }
+    }
   });
 </script>

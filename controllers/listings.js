@@ -1,11 +1,20 @@
 const Listing=require("../models/listing.js");
 const axios = require("axios");
 
-module.exports.index=async(req,res)=>{
+module.exports.index = async (req, res) => {
     const { category } = req.query;
     const filter = category ? { category } : {};
     const allListing = await Listing.find(filter);
-    res.render("./listing/index.ejs", { allListing, activeCategory: category || "Trending" });
+
+    // collect wishlist IDs as strings for easy comparison in the view
+    let wishlistIds = [];
+    if (req.user) {
+        const User = require("../models/user.js");
+        const user = await User.findById(req.user._id).select("wishlist");
+        wishlistIds = user.wishlist.map(id => id.toString());
+    }
+
+    res.render("./listing/index.ejs", { allListing, activeCategory: category || "Trending", wishlistIds });
 };
 
 module.exports.renderNewForm=(req,res)=>{    
@@ -25,24 +34,22 @@ module.exports.showNewListing=async(req,res)=>{
 module.exports.postListing=async (req, res) => {
     let url=req.file.path;
     let filename=req.file.filename;
-    // console.log(url+".."+filename);
 
     const { location } = req.body.listing;
-
     const geoURL = `https://api.maptiler.com/geocoding/${encodeURIComponent(location)}.json?key=${process.env.MAP_TOKEN}`;
-
     const geoResponse = await axios.get(geoURL);
 
+    if (!geoResponse.data.features || geoResponse.data.features.length === 0) {
+        req.flash("error", "Could not find location on map. Please enter a valid location.");
+        return res.redirect("/listings/new");
+    }
+
     const newList = new Listing(req.body.listing);
-    newList.owner=req.user._id;
-    newList.image={url,filename}
+    newList.owner    = req.user._id;
+    newList.image    = { url, filename };
+    newList.geometry = geoResponse.data.features[0].geometry;
 
-    newList.geometry=geoResponse.data.features[0].geometry;
-
-    let savedList=await newList.save();
-    
-    console.log(savedList);
-
+    await newList.save();
     req.flash("success","New Listing Created");
     res.redirect("/listings");
 };

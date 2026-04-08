@@ -17,7 +17,11 @@ const userSchema = new Schema({
     isBlocked: {
         type: Boolean,
         default: false
-    }
+    },
+    wishlist: [{
+        type: Schema.Types.ObjectId,
+        ref: "Listing"
+    }]
 });
 
 userSchema.plugin(passportLocalMongoose);

@@ -4,11 +4,13 @@ const ExpressError=require('./utils/ExpressError.js');
 const{listingSchema,reviewSchema}=require("./schema.js");
 
 module.exports.isLoggedIn=(req,res,next)=>{
-    // console.log(req.originalUrl);
     if(!req.isAuthenticated()){
-        // resRedirectUrl
-        req.session.redirectUrl=req.originalUrl;
-        req.flash("error","You must login to create a Listing!");
+        // if it's a fetch/AJAX request, return 401 JSON
+        if (req.xhr || req.headers.accept?.includes("application/json")) {
+            return res.status(401).json({ error: "Login required" });
+        }
+        req.session.redirectUrl = req.originalUrl;
+        req.flash("error","You must be logged in!");
         return res.redirect("/login");
     }
     next();
@@ -22,9 +24,13 @@ module.exports.saveUrlInfo=(req,res,next)=>{
 };
 
 module.exports.ownerOf=async(req,res,next)=>{
-        let { id } = req.params;
-        let listing = await Listing.findById(id);
-        if (!listing.owner.equals(req.user._id)){
+    let { id } = req.params;
+    let listing = await Listing.findById(id);
+    if (!listing) {
+        req.flash("error", "Listing not found.");
+        return res.redirect("/listings");
+    }
+    if (!listing.owner.equals(req.user._id)){
         req.flash("error", "You are not the owner of this listing");
         return res.redirect(`/listings/${id}`);
     }
