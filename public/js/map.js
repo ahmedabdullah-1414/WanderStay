@@ -1,5 +1,6 @@
-if (!coordinates) {
-  document.getElementById("map").style.display = "none";
+if (!coordinates || !mapToken) {
+  const mapEl = document.getElementById("map");
+  if (mapEl) mapEl.style.display = "none";
 } else {
   const map = new maplibregl.Map({
     container: "map",

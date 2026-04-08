@@ -1,7 +1,14 @@
 <% layout("/layouts/boilerplate") -%>
 <script>
-  const mapToken = "<%= process.env.MAP_TOKEN %>";
-  const coordinates = <%- JSON.stringify(listing.geometry && listing.geometry.coordinates && listing.geometry.coordinates.length ? listing.geometry.coordinates : null) %>;
+  const mapToken = "<%= process.env.MAP_TOKEN || '' %>";
+  const coordinates = <%- JSON.stringify(
+    listing.geometry &&
+    listing.geometry.coordinates &&
+    listing.geometry.coordinates.length === 2 &&
+    (listing.geometry.coordinates[0] !== 0 || listing.geometry.coordinates[1] !== 0)
+      ? listing.geometry.coordinates
+      : null
+  ) %>;
 </script>
 
 <div class="show-page">

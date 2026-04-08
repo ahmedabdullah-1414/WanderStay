@@ -1,15 +1,10 @@
-/**
- * Run once: node init/fixGeometry.js
- * Backfills geometry for ALL listings that are missing valid coordinates.
- */
-
 if (process.env.NODE_ENV !== "production") require("dotenv").config();
 
 const mongoose = require("mongoose");
 const axios = require("axios");
 const Listing = require("../models/listing.js");
 
-const URL_MONGO = "mongodb://127.0.0.1:27017/wanderlust";
+const URL_MONGO = process.env.MONGO_URL || "mongodb://127.0.0.1:27017/wanderlust";
 
 function hasValidGeometry(listing) {
   return (
