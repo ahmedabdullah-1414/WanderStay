@@ -20,20 +20,17 @@ const listingController=require("../controllers/listings.js");
 
 router.route("/")
     .get(wrapAsync(listingController.index))
-    .post(isLoggedIn,upload.single('listing[image]'),validateListing,wrapAsync(listingController.postListing));
-    // .post(upload.single('listing[image]'),(req,res)=>{
-    //     res.send(req.file);
-    // });
+    .post(isLoggedIn, upload.single('image'), validateListing, wrapAsync(listingController.postListing));
 
 // New 
-router.get("/new",isLoggedIn,listingController.renderNewForm);
+router.get("/new", isLoggedIn, listingController.renderNewForm);
 
 router.route("/:id")
     .get(wrapAsync(listingController.showNewListing))
-    .put(isLoggedIn , ownerOf , upload.single('listing[image]') , validateListing , wrapAsync(listingController.updateListing))
-    .delete(isLoggedIn , ownerOf , wrapAsync(listingController.deleteListing))
+    .put(isLoggedIn, ownerOf, upload.single('image'), validateListing, wrapAsync(listingController.updateListing))
+    .delete(isLoggedIn, ownerOf, wrapAsync(listingController.deleteListing))
 
 // Edit
-router.get("/:id/edit",isLoggedIn,ownerOf,wrapAsync(listingController.renderEditForm));
+router.get("/:id/edit", isLoggedIn, ownerOf, wrapAsync(listingController.renderEditForm));
 
 module.exports=router;

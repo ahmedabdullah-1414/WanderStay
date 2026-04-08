@@ -32,8 +32,13 @@ module.exports.showNewListing=async(req,res)=>{
 };
 
 module.exports.postListing=async (req, res) => {
-    let url=req.file.path;
-    let filename=req.file.filename;
+    if (!req.file) {
+        req.flash("error", "Please upload an image.");
+        return res.redirect("/listings/new");
+    }
+
+    let url = req.file.path;
+    let filename = req.file.filename;
 
     const { location } = req.body.listing;
     const geoURL = `https://api.maptiler.com/geocoding/${encodeURIComponent(location)}.json?key=${process.env.MAP_TOKEN}`;
