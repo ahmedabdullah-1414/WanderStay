@@ -7,20 +7,21 @@ cloudinary.config({
     api_secret:  process.env.CLOUD_API_SECRET,
 });
 
-// warn if Cloudinary is not configured
 if (!process.env.CLOUD_NAME || !process.env.CLOUD_API_KEY || !process.env.CLOUD_API_SECRET) {
-    console.warn("⚠️  Cloudinary env vars missing — image uploads will fail");
+    console.error("❌ Cloudinary env vars missing:", {
+        CLOUD_NAME:    !!process.env.CLOUD_NAME,
+        CLOUD_API_KEY: !!process.env.CLOUD_API_KEY,
+        CLOUD_API_SECRET: !!process.env.CLOUD_API_SECRET,
+    });
 }
 
 const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: 'wanderLust_DEV',
-    allowedFormats:["png","jpg","jpeg"],
-  },
+    cloudinary: cloudinary,
+    params: {
+        folder: 'wanderStay',
+        allowedFormats: ["png", "jpg", "jpeg", "webp"],
+        transformation: [{ width: 1200, crop: "limit" }],
+    },
 });
 
-module.exports={
-    cloudinary,
-    storage
-}
+module.exports = { cloudinary, storage };

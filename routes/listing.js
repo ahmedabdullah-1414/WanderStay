@@ -23,7 +23,8 @@ router.route("/")
     .post(isLoggedIn, (req, res, next) => {
         upload.single('image')(req, res, (err) => {
             if (err) {
-                req.flash("error", `Upload failed: ${err.message}`);
+                console.error("Multer upload error:", err);
+                req.flash("error", `Upload failed: ${err.message || err.http_code || JSON.stringify(err)}`);
                 return res.redirect("/listings/new");
             }
             next();
