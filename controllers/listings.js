@@ -2,11 +2,24 @@ const Listing=require("../models/listing.js");
 const axios = require("axios");
 
 module.exports.index = async (req, res) => {
-    const { category } = req.query;
-    const filter = category ? { category } : {};
+    const { category, search } = req.query;
+
+    let filter = {};
+    if (search && search.trim()) {
+        const regex = new RegExp(search.trim(), "i");
+        filter = {
+            $or: [
+                { title:    regex },
+                { location: regex },
+                { country:  regex },
+            ]
+        };
+    } else if (category) {
+        filter = { category };
+    }
+
     const allListing = await Listing.find(filter);
 
-    // collect wishlist IDs as strings for easy comparison in the view
     let wishlistIds = [];
     if (req.user) {
         const User = require("../models/user.js");
@@ -14,7 +27,12 @@ module.exports.index = async (req, res) => {
         wishlistIds = user.wishlist.map(id => id.toString());
     }
 
-    res.render("./listing/index.ejs", { allListing, activeCategory: category || "Trending", wishlistIds });
+    res.render("./listing/index.ejs", {
+        allListing,
+        activeCategory: search ? null : (category || "Trending"),
+        wishlistIds,
+        searchQuery: search || "",
+    });
 };
 
 module.exports.renderNewForm=(req,res)=>{    

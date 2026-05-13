@@ -966,3 +966,55 @@ body {
     color: #717171;
     margin-bottom: 1.5rem;
 }
+
+/* ── Navbar search ── */
+.navbar-search-form { flex: 1; max-width: 420px; margin: 0 1.5rem; }
+.navbar-search-wrap {
+    display: flex;
+    align-items: center;
+    border: 1.5px solid #ddd;
+    border-radius: 2rem;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+    transition: box-shadow 0.2s;
+}
+.navbar-search-wrap:focus-within {
+    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    border-color: #bbb;
+}
+.navbar-search-icon {
+    padding: 0 0.75rem 0 1rem;
+    color: #717171;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+}
+.navbar-search-input {
+    border: none;
+    outline: none;
+    flex: 1;
+    font-size: 0.88rem;
+    font-family: inherit;
+    padding: 0.55rem 0;
+    background: transparent;
+    color: #222;
+    min-width: 0;
+}
+.navbar-search-input::placeholder { color: #aaa; }
+.navbar-search-btn {
+    background: #fe424d;
+    color: #fff;
+    border: none;
+    padding: 0.55rem 1.1rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s;
+    font-family: inherit;
+}
+.navbar-search-btn:hover { background: #e0313b; }
+
+@media (max-width: 768px) {
+    .navbar-search-form { max-width: 100%; margin: 0.5rem 0; order: 3; }
+}
