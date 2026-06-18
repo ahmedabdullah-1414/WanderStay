@@ -7,13 +7,7 @@ module.exports.index = async (req, res) => {
     let filter = {};
     if (search && search.trim()) {
         const regex = new RegExp(search.trim(), "i");
-        filter = {
-            $or: [
-                { title:    regex },
-                { location: regex },
-                { country:  regex },
-            ]
-        };
+        filter = { $or: [{ title: regex }, { location: regex }, { country: regex }] };
     } else if (category) {
         filter = { category };
     }

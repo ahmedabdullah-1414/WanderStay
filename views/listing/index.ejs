@@ -29,18 +29,22 @@
 </div>
 
 <div class="listings-grid">
-  <% if (searchQuery && searchQuery.length) { %>
-    <div style="grid-column:1/-1; padding:0.5rem 0 1rem;">
-      <p style="font-size:1rem;color:#717171;">
-        <% if (allListing.length > 0) { %>
-          <strong><%= allListing.length %></strong> result<%= allListing.length > 1 ? 's' : '' %> for "<%= searchQuery %>"
-        <% } else { %>
-          No results for "<%= searchQuery %>" — <a href="/listings">clear search</a>
-        <% } %>
-      </p>
+  <% if (typeof searchQuery !== 'undefined' && searchQuery.length > 0) { %>
+    <div style="grid-column:1/-1;padding:0.25rem 0 1rem;">
+      <% if (allListing.length > 0) { %>
+        <p style="font-size:0.95rem;color:#717171;">
+          <strong><%= allListing.length %></strong> result<%= allListing.length > 1 ? 's' : '' %> for "<strong><%= searchQuery %></strong>"
+          &nbsp;·&nbsp; <a href="/listings" style="color:#fe424d;font-weight:600">Clear</a>
+        </p>
+      <% } else { %>
+        <div class="no-results" style="padding:3rem 0">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <p>No listings found for "<%= searchQuery %>"</p>
+          <a href="/listings" class="btn airbnb-btn mt-3">Browse all</a>
+        </div>
+      <% } %>
     </div>
-  <% } %>
-  <% if (allListing.length === 0 && !searchQuery) { %>
+  <% } else if (allListing.length === 0) { %>
     <div class="no-results">
       <i class="fa-solid fa-magnifying-glass"></i>
       <p>No listings found in this category yet.</p>
