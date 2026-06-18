@@ -6,11 +6,14 @@
     </a>
     <form class="navbar-search-form" action="/listings" method="GET" role="search">
       <div class="navbar-search-wrap">
-        <i class="fa-solid fa-magnifying-glass navbar-search-icon"></i>
         <input class="navbar-search-input" type="search" name="search"
                placeholder="Search destinations, cities..."
-               aria-label="Search" autocomplete="off" />
-        <button class="navbar-search-btn" type="submit">Search</button>
+               aria-label="Search" autocomplete="off"
+               style="padding-left:1.1rem" />
+        <button class="navbar-search-btn" type="submit">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <span>Search</span>
+        </button>
       </div>
     </form>
 
