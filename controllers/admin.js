@@ -2,7 +2,6 @@ const User    = require("../models/user.js");
 const Listing = require("../models/listing.js");
 const Booking = require("../models/booking.js");
 
-// ── GET /admin ── dashboard stats ────────────────────────────────────────────
 module.exports.dashboard = async (req, res) => {
     const [totalUsers, totalListings, totalBookings, revenueData] = await Promise.all([
         User.countDocuments({ role: "user" }),
@@ -16,7 +15,6 @@ module.exports.dashboard = async (req, res) => {
 
     const totalRevenue = revenueData[0]?.total || 0;
 
-    // monthly bookings for the last 6 months
     const sixMonthsAgo = new Date();
     sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5);
     sixMonthsAgo.setDate(1);
@@ -36,7 +34,6 @@ module.exports.dashboard = async (req, res) => {
     const chartBookings = monthlyData.map(d => d.bookings);
     const chartRevenue  = monthlyData.map(d => d.revenue);
 
-    // top 5 most booked listings
     const topListings = await Booking.aggregate([
         { $match: { status: { $ne: "cancelled" } } },
         { $group: { _id: "$listing", count: { $sum: 1 } } },
@@ -47,7 +44,6 @@ module.exports.dashboard = async (req, res) => {
         { $project: { "listing.title": 1, "listing.location": 1, count: 1 } }
     ]);
 
-    // revenue by category
     const categoryRevenue = await Booking.aggregate([
         { $match: { status: { $ne: "cancelled" } } },
         { $lookup: { from: "listings", localField: "listing", foreignField: "_id", as: "listing" } },
@@ -56,7 +52,6 @@ module.exports.dashboard = async (req, res) => {
         { $sort: { revenue: -1 } }
     ]);
 
-    // revenue by country
     const countryRevenue = await Booking.aggregate([
         { $match: { status: { $ne: "cancelled" } } },
         { $lookup: { from: "listings", localField: "listing", foreignField: "_id", as: "listing" } },
@@ -79,7 +74,6 @@ module.exports.dashboard = async (req, res) => {
     });
 };
 
-// ── GET /admin/users ─────────────────────────────────────────────────────────
 module.exports.users = async (req, res) => {
     const { search = "", page = 1 } = req.query;
     const limit = 15;
@@ -101,7 +95,6 @@ module.exports.users = async (req, res) => {
     });
 };
 
-// ── PATCH /admin/users/:id/block ─────────────────────────────────────────────
 module.exports.toggleBlock = async (req, res) => {
     const user = await User.findById(req.params.id);
     if (!user) { req.flash("error", "User not found"); return res.redirect("/admin/users"); }
@@ -111,14 +104,12 @@ module.exports.toggleBlock = async (req, res) => {
     res.redirect("/admin/users");
 };
 
-// ── DELETE /admin/users/:id ───────────────────────────────────────────────────
 module.exports.deleteUser = async (req, res) => {
     await User.findByIdAndDelete(req.params.id);
     req.flash("success", "User deleted.");
     res.redirect("/admin/users");
 };
 
-// ── GET /admin/listings ───────────────────────────────────────────────────────
 module.exports.listings = async (req, res) => {
     const { search = "", page = 1 } = req.query;
     const limit = 15;
@@ -142,14 +133,12 @@ module.exports.listings = async (req, res) => {
     });
 };
 
-// ── DELETE /admin/listings/:id ────────────────────────────────────────────────
 module.exports.deleteListing = async (req, res) => {
     await Listing.findByIdAndDelete(req.params.id);
     req.flash("success", "Listing deleted.");
     res.redirect("/admin/listings");
 };
 
-// ── GET /admin/bookings ───────────────────────────────────────────────────────
 module.exports.bookings = async (req, res) => {
     const { status = "", page = 1 } = req.query;
     const limit = 15;
@@ -170,7 +159,6 @@ module.exports.bookings = async (req, res) => {
     });
 };
 
-// ── PATCH /admin/bookings/:id/cancel ─────────────────────────────────────────
 module.exports.cancelBooking = async (req, res) => {
     await Booking.findByIdAndUpdate(req.params.id, { status: "cancelled" });
     req.flash("success", "Booking cancelled.");
